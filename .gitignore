@@ -39,7 +39,6 @@ dist-ssr
 # Deploy artifacts (don't push to git)
 deploy-rbb.zip
 rbb_backup.sql
-aduh.md
 db_tables.json
 DEPLOYMENT_CPANEL_SSH.md
 
