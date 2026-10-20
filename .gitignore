@@ -44,3 +44,5 @@ DEPLOYMENT_CPANEL_SSH.md
 
 # User-uploaded files (managed on server, not in git)
 public/uploads/
+
+..
