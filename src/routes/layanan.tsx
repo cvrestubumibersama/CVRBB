@@ -1,24 +1,29 @@
+import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import { BackHomeBar, Button, Card, PageHero, Reveal } from "@/components/site/ui";
+import { BackHomeBar, Button, Card, PageHero, Reveal, AutoSlider } from "@/components/site/ui";
 import { useI18n } from "@/lib/i18n";
-import { pick, services, workSteps } from "@/lib/site-data";
+import { pick, useServices, useWorkSteps } from "@/lib/api";
 import { ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/layanan")({
   head: () => ({
     meta: [
-      { title: "Layanan — CV. Restu Bumi Bersama" },
-      { name: "description", content: "Konstruksi bangunan, renovasi & interior, pekerjaan sipil, dan mekanikal elektrikal oleh CV. Restu Bumi Bersama." },
-      { property: "og:title", content: "Layanan — CV. Restu Bumi Bersama" },
+      { title: "Layanan Kontraktor Madiun | CV. Restu Bumi Bersama" },
+      { name: "description", content: "Layanan kontraktor di Madiun: konstruksi, renovasi rumah, pekerjaan sipil, dan instalasi M&E oleh CV RBB. Melayani Madiun & Caruban." },
+      { property: "og:title", content: "Layanan | CV. Restu Bumi Bersama" },
       { property: "og:description", content: "Solusi konstruksi terintegrasi dari perencanaan hingga serah terima." },
     ],
   }),
   component: LayananPage,
 });
 
+
+
 function LayananPage() {
   const { t, lang } = useI18n();
+  const { data: services = [] } = useServices();
+  const { data: workSteps = [] } = useWorkSteps();
   return (
     <SiteLayout>
       <PageHero
@@ -33,8 +38,8 @@ function LayananPage() {
         {services.map((s, i) => (
           <Reveal key={s.slug} delay={i * 0.08}>
             <Card className="overflow-hidden h-full flex flex-col md:flex-row">
-              <div className="md:w-2/5 aspect-[4/3] md:aspect-auto overflow-hidden bg-muted">
-                <img src={`https://images.unsplash.com/photo-${["1503387762-592deb58ef4e", "1497366216548-37526070297c", "1565608087341-404b25492fee", "1541888946425-d81bb19240f5"][i]}?w=800&q=70`} alt={pick(s.title, lang)} className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy" />
+              <div className="md:w-2/5 aspect-[4/3] md:aspect-auto overflow-hidden bg-muted relative">
+                <AutoSlider images={s.image_urls || (s.image_url ? [s.image_url] : [])} alt={pick(s.title, lang)} />
               </div>
               <div className="p-6 flex-1">
                 <div className="text-2xl">{s.icon}</div>

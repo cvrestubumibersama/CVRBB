@@ -20,14 +20,14 @@
 }
 
 :root {
-  --background: #FAFAF8;
+  --background: #FFFFFF;
   --foreground: #1A1A1A;
   --primary: #D42027;
   --primary-foreground: #FFFFFF;
-  --muted: #F0EFEA;
+  --muted: #FFFFFF;
   --muted-foreground: #6B6B6B;
   --border: #E5E4E0;
-  --surface: #F0EFEA;
+  --surface: #FFFFFF;
   --navbar: #FFFFFF;
 }
 

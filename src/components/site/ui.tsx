@@ -39,6 +39,7 @@ type BtnProps = {
   children: ReactNode;
   to?: string;
   href?: string;
+  download?: boolean | string;
   variant?: "primary" | "outline" | "ghost";
   size?: "md" | "lg";
   className?: string;
@@ -46,7 +47,7 @@ type BtnProps = {
   type?: "button" | "submit";
 };
 
-export function Button({ children, to, href, variant = "primary", size = "md", className = "", onClick, type }: BtnProps) {
+export function Button({ children, to, href, download, variant = "primary", size = "md", className = "", onClick, type }: BtnProps) {
   const base = "inline-flex items-center justify-center gap-2 font-medium rounded-md transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]/50 relative overflow-hidden group";
   const sizes = { md: "h-10 px-5 text-sm", lg: "h-12 px-7 text-base" };
   const variants = {
@@ -57,7 +58,7 @@ export function Button({ children, to, href, variant = "primary", size = "md", c
   const cls = `${base} ${sizes[size]} ${variants[variant]} ${className}`;
   const inner = <span className="relative z-10 flex items-center gap-2">{children}</span>;
   if (to) return <Link to={to} className={cls}>{inner}</Link>;
-  if (href) return <a href={href} className={cls} target="_blank" rel="noopener noreferrer">{inner}</a>;
+  if (href) return <a href={href} download={download} className={cls} target="_blank" rel="noopener noreferrer">{inner}</a>;
   return <button type={type} onClick={onClick} className={cls}>{inner}</button>;
 }
 
@@ -104,3 +105,57 @@ export function Card({ children, className = "" }: { children: ReactNode; classN
     </div>
   );
 }
+
+export function AutoSlider({ images, alt }: { images: string[]; alt: string }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(true);
+
+  useEffect(() => {
+    if (!images || images.length <= 1) return;
+    const interval = setInterval(() => {
+      setIsTransitioning(true);
+      setCurrentIndex((prev) => prev + 1);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [images]);
+
+  useEffect(() => {
+    if (!images || images.length <= 1) return;
+    // If we've reached the duplicated first image (at the end)
+    if (currentIndex === images.length) {
+      const timeout = setTimeout(() => {
+        setIsTransitioning(false);
+        setCurrentIndex(0);
+      }, 1000); // 1000ms matches the transition duration
+      return () => clearTimeout(timeout);
+    }
+  }, [currentIndex, images]);
+
+  if (!images || images.length === 0) {
+    return <div className="h-full w-full bg-muted flex items-center justify-center text-slate-400">No Image</div>;
+  }
+
+  // Duplicate the first image to create a seamless loop
+  const displayImages = images.length > 1 ? [...images, images[0]] : images;
+
+  return (
+    <div className="relative w-full h-full overflow-hidden bg-muted">
+      <div 
+        className={`flex w-full h-full ${isTransitioning ? 'transition-transform duration-1000 ease-in-out' : ''}`}
+        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+      >
+        {displayImages.map((img, i) => (
+          <div key={i} className="w-full h-full shrink-0">
+            <img
+              src={img}
+              alt={`${alt} ${i + 1}`}
+              className="h-full w-full object-cover hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+

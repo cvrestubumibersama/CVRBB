@@ -16,6 +16,7 @@ import { Route as LayananRouteImport } from './routes/layanan'
 import { Route as ProdukRouteImport } from './routes/produk'
 import { Route as ProyekLegalitasRouteImport } from './routes/proyek-legalitas'
 import { Route as TentangKamiRouteImport } from './routes/tentang-kami'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as ArtikelSlugRouteImport } from './routes/artikel.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -53,6 +54,11 @@ const TentangKamiRoute = TentangKamiRouteImport.update({
   path: '/tentang-kami',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ArtikelSlugRoute = ArtikelSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -67,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/produk': typeof ProdukRoute
   '/proyek-legalitas': typeof ProyekLegalitasRoute
   '/tentang-kami': typeof TentangKamiRoute
+  '/admin/login': typeof AdminLoginRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
 }
 export interface FileRoutesByTo {
@@ -77,6 +84,7 @@ export interface FileRoutesByTo {
   '/produk': typeof ProdukRoute
   '/proyek-legalitas': typeof ProyekLegalitasRoute
   '/tentang-kami': typeof TentangKamiRoute
+  '/admin/login': typeof AdminLoginRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
 }
 export interface FileRoutesById {
@@ -88,6 +96,7 @@ export interface FileRoutesById {
   '/produk': typeof ProdukRoute
   '/proyek-legalitas': typeof ProyekLegalitasRoute
   '/tentang-kami': typeof TentangKamiRoute
+  '/admin/login': typeof AdminLoginRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
 }
 export interface FileRouteTypes {
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
     | '/produk'
     | '/proyek-legalitas'
     | '/tentang-kami'
+    | '/admin/login'
     | '/artikel/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
     | '/produk'
     | '/proyek-legalitas'
     | '/tentang-kami'
+    | '/admin/login'
     | '/artikel/$slug'
   id:
     | '__root__'
@@ -120,6 +131,7 @@ export interface FileRouteTypes {
     | '/produk'
     | '/proyek-legalitas'
     | '/tentang-kami'
+    | '/admin/login'
     | '/artikel/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -131,6 +143,7 @@ export interface RootRouteChildren {
   ProdukRoute: typeof ProdukRoute
   ProyekLegalitasRoute: typeof ProyekLegalitasRoute
   TentangKamiRoute: typeof TentangKamiRoute
+  AdminLoginRoute: typeof AdminLoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -184,6 +197,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TentangKamiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/artikel/$slug': {
       id: '/artikel/$slug'
       path: '/$slug'
@@ -213,6 +233,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProdukRoute: ProdukRoute,
   ProyekLegalitasRoute: ProyekLegalitasRoute,
   TentangKamiRoute: TentangKamiRoute,
+  AdminLoginRoute: AdminLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

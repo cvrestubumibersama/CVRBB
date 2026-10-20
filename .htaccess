@@ -1,0 +1,53 @@
+# ==============================================================================
+# CV. Restu Bumi Bersama — Apache / cPanel Production Configuration
+# ==============================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # 1. Reverse Proxy API Requests to Backend (Express Port 4000)
+    <IfModule mod_proxy.c>
+        RewriteRule ^api/(.*)$ http://127.0.0.1:4000/api/$1 [P,L]
+    </IfModule>
+
+    # 2. Direct Static Files Serving (Optimized performance for uploads & assets)
+    RewriteCond %{DOCUMENT_ROOT}/public/uploads/$1 -f
+    RewriteRule ^uploads/(.*)$ /public/uploads/$1 [L]
+
+    # If upload file not found in docroot, proxy to backend upload handler
+    <IfModule mod_proxy.c>
+        RewriteRule ^uploads/(.*)$ http://127.0.0.1:4000/uploads/$1 [P,L]
+    </IfModule>
+
+    # 3. Admin Dashboard SPA Routing (/admin)
+    # Serve static assets inside /admin/ (CSS, JS, images)
+    RewriteCond %{DOCUMENT_ROOT}/public/admin/$1 -f
+    RewriteRule ^admin/(.*)$ /public/admin/$1 [L]
+
+    # Fallback all /admin and /admin/* routes to /public/admin/index.html (SPA router)
+    RewriteRule ^admin(/.*)?$ /public/admin/index.html [L]
+
+    # 4. Serve public directory assets directly if exists
+    RewriteCond %{DOCUMENT_ROOT}/public/$1 -f
+    RewriteRule ^(.*)$ /public/$1 [L]
+
+    # 5. Reverse Proxy all other requests to Frontend (TanStack Start / Nitro SSR Port 3000)
+    <IfModule mod_proxy.c>
+        RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
+    </IfModule>
+</IfModule>
+
+# ==============================================================================
+# Security Headers & Gzip Compression
+# ==============================================================================
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json application/xml
+</IfModule>

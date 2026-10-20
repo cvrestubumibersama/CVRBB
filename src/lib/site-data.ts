@@ -3,8 +3,8 @@ import type { Lang } from "./i18n";
 export const COMPANY = {
   name: "CV. Restu Bumi Bersama",
   address: "Ngampel, Kabupaten Madiun, Jawa Timur, Indonesia",
-  phone: "+62 812-3456-7890",
-  whatsapp: "6281234567890",
+  phone: "+62 857-4818-5726",
+  whatsapp: "6285748185726",
   email: "info@restubumibersama.co.id",
 };
 

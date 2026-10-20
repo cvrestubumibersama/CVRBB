@@ -1,75 +1,81 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import { BackHomeBar, Card, PageHero, Reveal } from "@/components/site/ui";
 import { useI18n } from "@/lib/i18n";
-import { articles, pick } from "@/lib/site-data";
-import { useMemo, useState } from "react";
-import { Calendar } from "lucide-react";
+import { useEffect } from "react";
+import { Newspaper, ArrowLeft, Sparkles, Construction, CheckCircle2 } from "lucide-react";
+import { useComingSoon } from "@/components/site/ComingSoonModal";
 
 export const Route = createFileRoute("/artikel")({
+  beforeLoad: () => {
+    throw redirect({
+      to: "/",
+      search: { comingSoon: "artikel" } as any,
+    });
+  },
   head: () => ({
     meta: [
-      { title: "Artikel & Berita — CV. Restu Bumi Bersama" },
-      { name: "description", content: "Tips konstruksi, update proyek, dan berita perusahaan dari CV. Restu Bumi Bersama." },
-      { property: "og:title", content: "Artikel & Berita — CV. Restu Bumi Bersama" },
-      { property: "og:description", content: "Wawasan seputar konstruksi dan material bangunan." },
+      { title: "Artikel & Berita (Segera Hadir) — CV. Restu Bumi Bersama" },
+      { name: "description", content: "Halaman Artikel & Berita CV. Restu Bumi Bersama akan segera hadir." },
+      { property: "og:title", content: "Artikel & Berita Segera Hadir — CV. Restu Bumi Bersama" },
+      { property: "og:description", content: "Fitur ini sedang dalam pengembangan." },
     ],
   }),
   component: ArticlesPage,
 });
 
 function ArticlesPage() {
-  const { t, lang } = useI18n();
-  const categories = useMemo(() => Array.from(new Set(articles.map((a) => pick(a.category, lang)))), [lang]);
-  const [cat, setCat] = useState("all");
-  const filtered = cat === "all" ? articles : articles.filter((a) => pick(a.category, lang) === cat);
+  const { lang } = useI18n();
+  const { openComingSoon } = useComingSoon();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    openComingSoon();
+  }, [openComingSoon]);
 
   return (
     <SiteLayout>
-      <PageHero
-        eyebrow={t("nav.articles")}
-        title={t("articles.title")}
-        subtitle="Wawasan seputar konstruksi, tips memilih material, dan update proyek terbaru."
-        image="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&q=70"
-      />
-      <BackHomeBar label={t("nav.articles")} />
-
-      <section className="mx-auto max-w-7xl px-4 md:px-6 py-12">
-        <div className="flex flex-wrap gap-2 mb-8">
-          <FilterChip active={cat === "all"} onClick={() => setCat("all")}>{t("products.all")}</FilterChip>
-          {categories.map((c) => (
-            <FilterChip key={c} active={cat === c} onClick={() => setCat(c)}>{c}</FilterChip>
-          ))}
+      <div className="min-h-[75vh] flex flex-col items-center justify-center px-4 py-20 text-center">
+        <div className="relative mb-6">
+          <div className="w-20 h-20 rounded-3xl bg-red-50 flex items-center justify-center text-[var(--primary)] shadow-sm border border-red-100">
+            <Newspaper className="w-10 h-10" />
+          </div>
+          <div className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-amber-500 text-white shadow-md">
+            <Sparkles className="w-4 h-4" />
+          </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((a, i) => (
-            <Reveal key={a.slug} delay={(i % 3) * 0.08}>
-              <Link to="/artikel/$slug" params={{ slug: a.slug }} className="block h-full">
-                <Card className="overflow-hidden h-full">
-                  <div className="aspect-[16/10] overflow-hidden bg-muted">
-                    <img src={a.img} alt={pick(a.title, lang)} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
-                  </div>
-                  <div className="p-5">
-                    <div className="flex items-center gap-3 text-xs">
-                      <span className="text-[var(--primary)] font-semibold uppercase tracking-widest">{pick(a.category, lang)}</span>
-                      <span className="flex items-center gap-1 text-muted-foreground"><Calendar className="h-3 w-3" />{a.date}</span>
-                    </div>
-                    <h3 className="mt-3 font-display font-semibold text-lg leading-snug">{pick(a.title, lang)}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{pick(a.excerpt, lang)}</p>
-                  </div>
-                </Card>
-              </Link>
-            </Reveal>
-          ))}
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 mb-4">
+          <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+          <span>{lang === "en" ? "UNDER CONSTRUCTION" : "DALAM PENGEMBANGAN"}</span>
         </div>
-      </section>
+
+        <h1 className="font-display text-3xl md:text-5xl font-bold tracking-tight text-foreground max-w-xl">
+          {lang === "en" ? "Articles & News Coming Soon" : "Halaman Artikel & Berita Segera Hadir"}
+        </h1>
+
+        <p className="mt-4 max-w-lg text-muted-foreground text-sm md:text-base leading-relaxed">
+          {lang === "en"
+            ? "We are preparing high quality articles, project updates, and construction guides. This page is not accessible yet and will be launched soon!"
+            : "Halaman ini sedang dalam tahap kurasi konten dan pengembangan. Pengunjung belum dapat mengakses konten artikel saat ini. Nantikan peluncurannya segera!"}
+        </p>
+
+        <div className="mt-8 flex flex-wrap gap-3 justify-center">
+          <button
+            onClick={() => navigate({ to: "/" })}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[var(--primary)] text-white text-sm font-medium hover:opacity-90 active:scale-95 transition-all shadow-md shadow-red-500/20 cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>{lang === "en" ? "Back to Homepage" : "Kembali ke Beranda"}</span>
+          </button>
+          <button
+            onClick={() => openComingSoon()}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-border bg-white text-foreground text-sm font-medium hover:bg-neutral-50 transition-colors cursor-pointer"
+          >
+            <Construction className="w-4 h-4 text-amber-600" />
+            <span>{lang === "en" ? "View Details" : "Lihat Keterangan"}</span>
+          </button>
+        </div>
+      </div>
     </SiteLayout>
-  );
-}
-
-function FilterChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button onClick={onClick} className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-150 ${active ? "bg-[var(--primary)] text-white border-[var(--primary)]" : "bg-white text-foreground border-border hover:border-[var(--primary)] hover:text-[var(--primary)]"}`}>{children}</button>
   );
 }

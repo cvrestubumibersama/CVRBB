@@ -3,13 +3,19 @@
   "private": true,
   "sideEffects": false,
   "type": "module",
+  "main": "app.js",
   "engines": {
     "node": ">=18"
   },
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "build:admin": "npm --prefix admin-frontend run build",
+    "build:frontend": "vite build",
+    "build:all": "npm run build:admin && npm run build:frontend",
     "build:dev": "vite build --mode development",
+    "start:backend": "node backend/src/index.js",
+    "start:frontend": "node .output/server/index.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write ."
@@ -47,6 +53,7 @@
     "@tanstack/react-router": "^1.170.16",
     "@tanstack/react-start": "^1.168.26",
     "@tanstack/router-plugin": "^1.168.18",
+    "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -55,6 +62,7 @@
     "framer-motion": "^12.42.2",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.575.0",
+    "mysql2": "^3.23.2",
     "react": "^19.2.0",
     "react-day-picker": "^9.14.0",
     "react-dom": "^19.2.0",

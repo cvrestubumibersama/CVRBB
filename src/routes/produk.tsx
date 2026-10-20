@@ -2,16 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { BackHomeBar, Button, Card, PageHero, Reveal } from "@/components/site/ui";
 import { useI18n } from "@/lib/i18n";
-import { pick, productCategories, products } from "@/lib/site-data";
+import { pick, useProductCategories, useProducts } from "@/lib/api";
 import { Download, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/produk")({
   head: () => ({
     meta: [
-      { title: "Produk — CV. Restu Bumi Bersama" },
-      { name: "description", content: "Katalog material bangunan: besi & baja, semen & beton, material umum. Supplier tepercaya di Jawa Timur." },
-      { property: "og:title", content: "Produk — CV. Restu Bumi Bersama" },
+      { title: "Supplier Material Bangunan Madiun | CV. Restu Bumi Bersama" },
+      { name: "description", content: "Katalog material bangunan di Madiun: besi, baja ringan, semen, dan material umum. Supplier tepercaya siap kirim ke Madiun & Caruban." },
+      { property: "og:title", content: "Produk | CV. Restu Bumi Bersama" },
       { property: "og:description", content: "Katalog bahan bangunan lengkap dengan harga kompetitif." },
     ],
   }),
@@ -22,6 +22,8 @@ function ProdukPage() {
   const { t, lang } = useI18n();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("all");
+  const { data: products = [] } = useProducts();
+  const { data: productCategories = [] } = useProductCategories();
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
@@ -29,7 +31,14 @@ function ProdukPage() {
       const matchQ = q.trim() === "" || p.name.toLowerCase().includes(q.toLowerCase()) || pick(p.spec, lang).toLowerCase().includes(q.toLowerCase());
       return matchCat && matchQ;
     });
-  }, [q, cat, lang]);
+  }, [q, cat, lang, products]);
+
+  const resolveImage = (url?: string) => {
+    if (!url) return "";
+    if (/^https?:\/\//.test(url)) return url;
+    if (url.startsWith("/")) return url;
+    return `/${url.replace(/^\/+/, "")}`;
+  };
 
   return (
     <SiteLayout>
@@ -52,32 +61,43 @@ function ProdukPage() {
               className="w-full h-11 pl-10 pr-4 rounded-md border border-border bg-white text-sm focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all"
             />
           </div>
-          <Button href="#" variant="outline"><Download className="h-4 w-4" /> {t("cta.downloadCatalog")}</Button>
+          <Button
+            href="/api/public/catalog-pdf"
+            download="Katalog-Produk-CV-Restu-Bumi-Bersama.pdf"
+            variant="outline"
+          >
+            <Download className="h-4 w-4" /> {t("cta.downloadCatalog")}
+          </Button>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-8">
           <FilterChip active={cat === "all"} onClick={() => setCat("all")}>{t("products.all")}</FilterChip>
           {productCategories.map((c) => (
             <FilterChip key={c.slug} active={cat === c.slug} onClick={() => setCat(c.slug)}>
-              {pick(c.label, lang)}
+              {pick(c.label, lang)}{c.price ? ` • ${c.price}` : ""}
             </FilterChip>
           ))}
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {filtered.map((p, i) => (
-            <Reveal key={p.name} delay={(i % 4) * 0.05}>
-              <Card className="overflow-hidden h-full">
-                <div className="aspect-square overflow-hidden bg-muted">
-                  <img src={p.img} alt={p.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-display text-sm font-semibold line-clamp-2">{p.name}</h3>
-                  <p className="mt-1 text-xs text-muted-foreground">{pick(p.spec, lang)}</p>
-                </div>
-              </Card>
-            </Reveal>
-          ))}
+          {filtered.map((p, i) => {
+            const imgSrc = resolveImage((p as any).img || (p as any).image_url);
+
+            return (
+              <Reveal key={p.name} delay={(i % 4) * 0.05}>
+                <Card className="overflow-hidden h-full">
+                  <div className="aspect-square overflow-hidden bg-muted">
+                    <img src={imgSrc} alt={p.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-display text-sm font-semibold line-clamp-2">{p.name}</h3>
+                    {p.price && <div className="mt-1 text-sm font-semibold text-[var(--primary)]">{p.price}</div>}
+                    <p className="mt-1 text-xs text-muted-foreground">{pick(p.spec, lang)}</p>
+                  </div>
+                </Card>
+              </Reveal>
+            );
+          })}
         </div>
 
         {filtered.length === 0 && (

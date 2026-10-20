@@ -31,3 +31,17 @@ dist-ssr
 *.sln
 *.sw?
 
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# Deploy artifacts (don't push to git)
+deploy-rbb.zip
+rbb_backup.sql
+aduh.md
+db_tables.json
+DEPLOYMENT_CPANEL_SSH.md
+
+# User-uploaded files (managed on server, not in git)
+public/uploads/

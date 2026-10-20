@@ -114,11 +114,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("id");
   useEffect(() => {
     try {
-      const stored = localStorage.getItem("lang") as Lang | null;
-      if (stored === "id" || stored === "en") setLangState(stored);
+      localStorage.setItem("lang", "id");
     } catch {}
   }, []);
   const setLang = (l: Lang) => {
+    if (l === "en") return;
     setLangState(l);
     try { localStorage.setItem("lang", l); } catch {}
   };

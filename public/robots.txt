@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /admin
+Allow: /
+
+Sitemap: https://restubumibersama.co.id/sitemap.xml
+Host: restubumibersama.co.id
+
+# Crawl-delay can be adjusted if needed
+# Crawl-delay: 10

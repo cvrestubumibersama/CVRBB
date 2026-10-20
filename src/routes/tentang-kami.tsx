@@ -2,14 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { BackHomeBar, Card, PageHero, Reveal } from "@/components/site/ui";
 import { useI18n } from "@/lib/i18n";
-import { advantages, org, pick } from "@/lib/site-data";
+import { pick, useAdvantages, useOrganizationMembers } from "@/lib/api";
 
 export const Route = createFileRoute("/tentang-kami")({
   head: () => ({
     meta: [
-      { title: "Tentang Kami — CV. Restu Bumi Bersama" },
+      { title: "Tentang Kami | CV. Restu Bumi Bersama" },
       { name: "description", content: "Sejarah, visi misi, dan struktur organisasi CV. Restu Bumi Bersama — kontraktor & supplier bahan bangunan sejak 2012." },
-      { property: "og:title", content: "Tentang Kami — CV. Restu Bumi Bersama" },
+      { property: "og:title", content: "Tentang Kami | CV. Restu Bumi Bersama" },
       { property: "og:description", content: "Kontraktor & supplier material bangunan sejak 2012 di Madiun." },
     ],
   }),
@@ -18,6 +18,9 @@ export const Route = createFileRoute("/tentang-kami")({
 
 function TentangPage() {
   const { t, lang } = useI18n();
+  const { data: advantages = [] } = useAdvantages();
+  const { data: org = [] } = useOrganizationMembers();
+
   return (
     <SiteLayout>
       <PageHero
@@ -29,9 +32,15 @@ function TentangPage() {
       <BackHomeBar label={t("nav.about")} />
 
       <section className="mx-auto max-w-4xl px-4 md:px-6 py-16 space-y-5 text-base leading-relaxed text-foreground/90">
-        <Reveal><p>{t("about.history")}</p></Reveal>
-        <Reveal delay={0.05}><p>{t("about.history2")}</p></Reveal>
-        <Reveal delay={0.1}><p>{t("about.history3")}</p></Reveal>
+        <Reveal>
+          <p>{t("about.history")}</p>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <p>{t("about.history2")}</p>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <p>{t("about.history3")}</p>
+        </Reveal>
       </section>
 
       <section className="bg-[var(--surface)] border-y border-border">
@@ -57,17 +66,25 @@ function TentangPage() {
         <Reveal>
           <h2 className="font-display text-3xl md:text-4xl font-semibold text-center">{t("about.orgTitle")}</h2>
         </Reveal>
-        <div className="mt-14 flex flex-col items-center gap-6">
-          <Reveal>
-            <OrgCard name={org[0].name} role={pick(org[0].role, lang)} highlight />
-          </Reveal>
-          <div className="grid grid-cols-1 sm:grid-cols-1 gap-6 w-full max-w-md">
-            <Reveal delay={0.1}><OrgCard name={org[1].name} role={pick(org[1].role, lang)} /></Reveal>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-3xl">
-            <Reveal delay={0.15}><OrgCard name={org[2].name} role={pick(org[2].role, lang)} /></Reveal>
-            <Reveal delay={0.2}><OrgCard name={org[3].name} role={pick(org[3].role, lang)} /></Reveal>
-          </div>
+
+        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {org.length > 0 ? (
+            org.map((member, index) => (
+              <Reveal key={member.id} delay={index * 0.05}>
+                <OrgCard
+                  id={member.id.toString()}
+                  name={member.name}
+                  role={pick(member.role, lang)}
+                  imageUrl={member.image_url}
+                  highlight={index === 0}
+                />
+              </Reveal>
+            ))
+          ) : (
+            <Reveal>
+              <div className="text-center text-slate-500 py-12">Data struktur organisasi belum tersedia.</div>
+            </Reveal>
+          )}
         </div>
       </section>
 
@@ -93,14 +110,65 @@ function TentangPage() {
   );
 }
 
-function OrgCard({ name, role, highlight }: { name: string; role: string; highlight?: boolean }) {
+function OrgCard({ id, name, role, imageUrl, highlight }: { id?: string; name: string; role: string; imageUrl?: string; highlight?: boolean }) {
+  const initials = name
+    .split(" ")
+    .map((s) => s[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+  const resolvedImage = imageUrl
+    ? imageUrl.match(/^https?:\/\//)
+      ? imageUrl
+      : imageUrl.startsWith("/")
+      ? imageUrl
+      : `/${imageUrl.replace(/^\/+/, "")}`
+    : null;
+
   return (
-    <div className={`text-center rounded-lg border p-6 min-w-[240px] transition-all duration-200 hover:-translate-y-1 ${highlight ? "bg-[var(--primary)] text-white border-[var(--primary)] shadow-lg" : "bg-white border-border"}`}>
-      <div className={`mx-auto h-14 w-14 rounded-full grid place-items-center font-display font-semibold text-lg ${highlight ? "bg-white/20 text-white" : "bg-[var(--surface)] text-foreground"}`}>
-        {name.split(" ").map((s) => s[0]).slice(0, 2).join("")}
+    <div
+      data-org-id={id}
+      className={`group relative mx-auto w-full max-w-[240px] overflow-hidden rounded-2xl border bg-white transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl ${
+        highlight ? "border-[var(--primary)]/30 shadow-md shadow-[var(--primary)]/5" : "border-border shadow-sm"
+      }`}
+    >
+      {/* Accent bar signals leadership without flooding the card in color */}
+      <div className={`h-1 w-full ${highlight ? "bg-[var(--primary)]" : "bg-transparent"}`} />
+
+      {/* Photo */}
+      <div className="relative aspect-[3/4] w-full overflow-hidden bg-white">
+        {resolvedImage ? (
+          <img
+            src={resolvedImage}
+            alt={name}
+            loading="lazy"
+            className="h-full w-full object-cover grayscale-[35%] transition-all duration-500 ease-out group-hover:grayscale-0 group-hover:scale-[1.04]"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--primary)]/12 via-white to-white">
+            <span className="font-display text-3xl font-semibold tracking-tight text-[var(--primary)]/70">
+              {initials}
+            </span>
+          </div>
+        )}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+        {highlight && (
+          <span className="absolute right-2.5 top-2.5 rounded-full bg-white/95 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-[var(--primary)] shadow-sm backdrop-blur-sm">
+            Pimpinan
+          </span>
+        )}
       </div>
-      <div className="mt-3 font-display font-semibold">{name}</div>
-      <div className={`mt-1 text-xs uppercase tracking-widest ${highlight ? "text-white/80" : "text-muted-foreground"}`}>{role}</div>
+
+      {/* Info */}
+      <div className="px-4 py-5 text-center">
+        <div className="font-display text-base font-semibold leading-tight text-foreground">{name}</div>
+        <div className="mx-auto mt-2.5 h-px w-6 bg-[var(--primary)]/40" />
+        <div className="mt-2.5 text-[11px] font-medium uppercase tracking-[0.15em] text-muted-foreground">
+          {role}
+        </div>
+      </div>
     </div>
   );
 }

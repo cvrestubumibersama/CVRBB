@@ -1,14 +1,27 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { BackHomeBar, Card, Reveal } from "@/components/site/ui";
 import { useI18n } from "@/lib/i18n";
-import { articles, pick } from "@/lib/site-data";
+import { getPublicApiUrl, pick, useArticles } from "@/lib/api";
 import { Calendar } from "lucide-react";
 
+async function fetchArticle(slug: string) {
+  const response = await fetch(getPublicApiUrl(`/articles/${slug}`));
+  if (!response.ok) {
+    throw notFound();
+  }
+  return response.json();
+}
+
 export const Route = createFileRoute("/artikel/$slug")({
-  loader: ({ params }) => {
-    const article = articles.find((a) => a.slug === params.slug);
-    if (!article) throw notFound();
+  beforeLoad: () => {
+    throw redirect({
+      to: "/",
+      search: { comingSoon: "artikel" } as any,
+    });
+  },
+  loader: async ({ params }) => {
+    const article = await fetchArticle(params.slug);
     return { article };
   },
   head: ({ loaderData }) => {
@@ -32,6 +45,7 @@ export const Route = createFileRoute("/artikel/$slug")({
 function ArticleDetail() {
   const { article } = Route.useLoaderData();
   const { lang, t } = useI18n();
+  const { data: articles = [] } = useArticles();
   const related = articles.filter((a) => a.slug !== article.slug).slice(0, 3);
 
   return (
