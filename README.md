@@ -1,5 +1,5 @@
 # CV. Restu Bumi Bersama — Company Profile Web App
-
+aaa
 Website company profile resmi **CV. Restu Bumi Bersama**, kontraktor & supplier bahan bangunan di Madiun, Jawa Timur. Dibangun dengan arsitektur fullstack modern: **TanStack Start** (SSR/SSG) untuk frontend dan **Express.js** untuk backend REST API yang terhubung ke database MySQL.
 
 ---
@@ -44,12 +44,14 @@ Aplikasi ini adalah website company profile dinamis yang kontennya dikelola mela
 - **Proyek & Legalitas** — Portfolio proyek dengan filter kategori, tampilan dokumen legalitas (NIB, NPWP, SBU, K3), unduh Company Profile PDF
 - **Tentang Kami** — Sejarah perusahaan, visi & misi, struktur organisasi, keunggulan perusahaan
 - **Klien & Kontak** — Marquee logo mitra, testimonial klien, peta lokasi (OpenStreetMap embed), formulir permintaan penawaran via WhatsApp
-- **Artikel & Berita** — Halaman placeholder (dalam pengembangan), redirect otomatis dengan modal "Coming Soon"
-- **Bilingual** — Struktur siap bilingual (ID/EN); bahasa Inggris dalam tahap pengembangan
+- **Artikel & Berita** — Dikunci dari UI publik dan dipersiapkan untuk next development; route dan file kode tetap disimpan tanpa mengubah backend/API. Dibuat setelah ada artikel tentang perusahaan
+- **Bilingual** — Struktur data dan dictionary siap mendukung ID/EN, tetapi fitur bahasa Inggris saat ini disembunyikan dari public interface untuk tahap pengembangan selanjutnya
 - **Responsif** — Layout mobile-first, hamburger menu untuk layar kecil
 - **SEO** — Meta tag lengkap per halaman, Open Graph, Twitter Card, structured data JSON-LD (LocalBusiness), `robots.txt`, `sitemap.xml`
 - **WhatsApp Float** — Tombol WhatsApp mengambang di semua halaman
 - **Loading Screen** — Splash screen animasi saat pertama kali memuat aplikasi
+
+> Catatan pengembangan: fitur bahasa Inggris dan halaman Artikel & Berita sedang disimpan untuk rilis berikutnya. Kode dan struktur bilingual/database sudah dipersiapkan, namun ditutup dari navigasi publik untuk menjaga fokus deploy frontend tanpa mengubah API/backend.
 
 ### Backend (Admin & API)
 
@@ -98,9 +100,15 @@ Frontend (TanStack Start — port 3000)
 | `/produk` | Katalog Produk | Grid produk, filter kategori, pencarian, unduh PDF |
 | `/proyek-legalitas` | Proyek & Legalitas | Portfolio proyek, dokumen legalitas, unduh company profile |
 | `/klien-kontak` | Klien & Kontak | Mitra, testimoni, peta, formulir penawaran via WA |
-| `/artikel` | Artikel & Berita | Redirect → beranda + modal "Segera Hadir" |
-| `/artikel/:slug` | Detail Artikel | Halaman detail artikel (konten dari DB) |
+| `/artikel` | Artikel & Berita | Dimasukkan dalam mode hidden / next development; route masih disimpan untuk pengembangan berikutnya |
+| `/artikel/:slug` | Detail Artikel | Disembunyikan dari UI publik, tetap tersimpan di codebase untuk kebutuhan next release |
 | `/admin/login` | Admin Login | Halaman login panel admin |
+
+### Catatan Next Development
+
+- **Bahasa Inggris**: seluruh string utama dan struktur data bilingual sudah disiapkan pada frontend melalui dictionary `src/lib/i18n.tsx`, tetapi tombol dan navigasi publik tetap dinonaktifkan agar deploy frontend tidak memunculkan fitur yang belum siap.
+- **Artikel & Berita**: route dan komponen artikel tetap disimpan di `src/routes/artikel.tsx` dan `src/routes/artikel.$slug.tsx` serta file pendukung terkait, namun tidak ditampilkan di navbar/footer karena fitur ini masih dalam tahap pengembangan lanjutan.
+- **Keamanan deploy**: perubahan yang dilakukan hanya menyangkut frontend/UI. Tidak ada endpoint, API, atau backend yang diubah, agar frontend dapat di-deploy ulang tanpa memodifikasi service backend.
 
 ---
 

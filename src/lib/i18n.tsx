@@ -110,6 +110,12 @@ const Ctx = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: (k: strin
   t: (k) => k,
 });
 
+function getInitialLang(): Lang {
+  // English mode is intentionally kept in codebase for future work,
+  // but it is hidden from the live public interface for now.
+  return "id";
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("id");
   useEffect(() => {

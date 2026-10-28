@@ -2,12 +2,10 @@ import { Link } from "@tanstack/react-router";
 import { useI18n } from "@/lib/i18n";
 import { useSettings } from "@/lib/api";
 import { Mail, Phone, MapPin } from "lucide-react";
-import { useComingSoon } from "./ComingSoonModal";
 
 export function Footer() {
   const { t } = useI18n();
   const { data: settings } = useSettings();
-  const { openComingSoon } = useComingSoon();
 
   return (
     <footer className="mt-24 border-t border-border bg-[var(--surface)]">
@@ -39,16 +37,6 @@ export function Footer() {
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><Link to="/proyek-legalitas" className="hover:text-[var(--primary)] transition-colors">{t("nav.projects")}</Link></li>
             <li><Link to="/klien-kontak" className="hover:text-[var(--primary)] transition-colors">{t("nav.contact")}</Link></li>
-            <li>
-              <button
-                type="button"
-                onClick={() => openComingSoon()}
-                className="hover:text-[var(--primary)] transition-colors cursor-pointer text-left flex items-center gap-1.5"
-              >
-                <span>{t("nav.articles")}</span>
-                <span className="text-[9px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">Soon</span>
-              </button>
-            </li>
           </ul>
         </div>
       </div>

@@ -131,9 +131,9 @@ function Hero() {
 function Stats() {
   const { t } = useI18n();
   const items = [
-    { n: 120, s: "+", label: t("stats.projects") },
-    { n: 12, s: "", label: t("stats.years") },
-    { n: 40, s: "+", label: t("stats.clients") },
+    { n: 50, s: "+", label: t("stats.projects") },
+    { n: 5, s: "", label: t("stats.years") },
+    { n: 20, s: "+", label: t("stats.clients") },
   ];
   return (
     <section className="border-b border-border bg-white">
